@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
+import com.facebook.v8.reactexecutor.V8ExecutorFactory;
 import com.facebook.react.NativeModuleRegistryBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.CatalystInstance;
@@ -65,8 +66,13 @@ public class ReactContextBuilder {
             SoLoader.loadLibrary("jscexecutor");
             return new JSCExecutorFactory(appName, deviceName);
         } catch (UnsatisfiedLinkError jscE) {
-            // Otherwise use Hermes
-            return new HermesExecutorFactory();
+            try {
+                SoLoader.loadLibrary("v8executor");
+                return new V8ExecutorFactory();
+            } catch (UnsatisfiedLinkError jscEr) {
+                // Otherwise use Hermes
+                return new HermesExecutorFactory();
+            }
         }
     }
 
